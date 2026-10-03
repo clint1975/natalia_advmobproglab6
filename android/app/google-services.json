@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "964733160135",
+    "project_id": "natalia-advmobprog",
+    "storage_bucket": "natalia-advmobprog.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:964733160135:android:2e3ac6b2137c7234858ce2",
+        "android_client_info": {
+          "package_name": "com.example.natalia_advmobprog"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcsD4pz5D1gZO9KBfkW6hNK1v5eJQk3Tc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // User profiles: any authenticated user can read the list, and each user
+    // can only create or change their own profile document.
+    match /users/{uid} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasAll([
+          'fName', 'lName', 'age', 'contactNo', 'username', 'email', 'createdAt'
+        ]);
+      allow update: if request.auth != null
+        && request.auth.uid == uid;
+      allow delete: if request.auth != null
+        && request.auth.uid == uid;
+    }
+
+    // One-to-one chat rooms are keyed as "<uidA>_<uidB>" in sorted order,
+    // so both participants can see the same messages and only the sender can
+    // create new ones.
+    match /chat_rooms/{roomId}/messages/{messageId} {
+      allow read: if request.auth != null
+        && request.auth.uid in roomId.split('_');
+
+      allow create: if request.auth != null
+        && request.auth.uid in roomId.split('_')
+        && request.resource.data.keys().hasAll([
+          'senderId', 'senderEmail', 'receiverId', 'message', 'timestamp', 'isRead'
+        ])
+        && request.resource.data.senderId == request.auth.uid
+        && request.resource.data.receiverId != request.auth.uid
+        && request.resource.data.senderEmail == request.auth.token.email
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 2000
+        && request.resource.data.timestamp is timestamp
+        && request.resource.data.isRead == false;
+
+      // The receiver may only flip the read state to true when they have seen it.
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.receiverId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead'])
+        && request.resource.data.isRead == true;
+    }
+  }
+}
